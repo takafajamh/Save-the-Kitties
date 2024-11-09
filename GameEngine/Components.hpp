@@ -14,6 +14,20 @@
 #include <unordered_map>
 #include <string>
 
+///todo
+/*
+Credits
+Settings
+Pause menu?
+Better cat release
+
+blok bazowy do configu
+level name pattern
+
+
+*/
+
+
 class Flags
 {
 public:
@@ -886,7 +900,11 @@ public:
 							Object* obs2 = GetScene()->CreateObject(t_tex); // cat
 							obs2->Layer = b2;
 							obs2->me.setScale(3, 3);
-							obs2->me.setPosition(x * Flags::BlockSizePixels * Flags::BlockScale + (Flags::BlockScale * Flags::BlockSizePixels / 2), y * Flags::BlockSizePixels * Flags::BlockScale + (Flags::BlockScale * Flags::BlockSizePixels / 1.2));
+
+							float yPos = obs->me.getGlobalBounds().top + obs->me.getGlobalBounds().height - obs2->me.getGlobalBounds().height;
+							float xPos = obs->me.getGlobalBounds().left + (obs->me.getGlobalBounds().width / 2) - (obs2->me.getGlobalBounds().width / 2);
+
+							obs2->me.setPosition(xPos, yPos);
 
 							oo->to = obs2;
 
@@ -1259,7 +1277,7 @@ public:
 	}
 	bool OnGround()
 	{
-		return (Holder->me.getPosition().y > 64*28*2 - 64);
+		return false;
 	}
 	bool reverseMove()
 	{
@@ -1342,7 +1360,7 @@ public:
 			if (velocity.x == 0)
 				catState = Standing;
 
-			if (velocity.y >= 25)
+			if (velocity.y >= 100)
 				catState = Falling;
 
 
@@ -1361,7 +1379,7 @@ public:
 				jumpForce = 0;
 			}
 
-			if (velocity.y >= 25)
+			if (velocity.y >= 100)
 				catState = Falling;
 
 			break;
