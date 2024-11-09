@@ -1,0 +1,51 @@
+// Cat settings
+CatSpeed: 300
+CatMaxSpeed: 400
+CatAccTime: 0.3
+CatDeccTime: 0.2
+CatJumpForce: 0
+CatMaxJumpForce: 800
+CatJumpForceSpeed: 1.1
+CatGravity: 1000
+
+// Block settings
+BlockScale: 2
+BlockSizePixels: 64
+
+// Paths
+LegendPath: GPX/sprite_legend.png
+SheetPath: GPX/spriteSheeta.png
+
+// Win block positions
+WinBlockPosition: 7;4
+
+// Dead block positions
+DeadBlockPositions: 2;4
+DeadBlockPositions: 3;4
+
+// Dead Block Positions Reverse - że sa na suficie
+DeadBlockPositionsReverse: 4;4
+DeadBlockPositionsReverse: 5;4
+
+// No-collide block positions
+NoCollideBlockPositions: 8;4
+
+// Button block positions
+ButtonBlockPositions: 4;0
+ButtonBlockPositions: 5;0
+ButtonBlockPositions: 4;1
+ButtonBlockPositions: 5;1
+ButtonBlockPositions: 4;2
+ButtonBlockPositions: 5;2
+ButtonBlockPositions: 4;3
+ButtonBlockPositions: 5;4
+
+// Laser block positions
+LaserBlockPositions: 6;0
+LaserBlockPositions: 7;0
+LaserBlockPositions: 6;2
+LaserBlockPositions: 7;3
+
+// Laser Ray Block Positions
+LaserRayBlockPositions: 6;1
+LaserRayBlockPositions: 7;1
