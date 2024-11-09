@@ -19,6 +19,10 @@ SheetPath: GPX/spriteSheeta.png
 // Win block positions
 WinBlockPosition: 7;4
 
+//Base Background Block - base ass background, needed
+BaseBackgroundBlock:8;4
+
+
 // Dead block positions
 DeadBlockPositions: 2;4
 DeadBlockPositions: 3;4

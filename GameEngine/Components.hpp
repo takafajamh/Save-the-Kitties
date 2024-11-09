@@ -54,7 +54,7 @@ public:
 	static inline int BlockSizePixels = 0;
 	static inline std::string LegendPath;
 	static inline std::string SheetPath;
-
+	static inline sf::Vector2i BaseBackgroundBlock;
 
 	static inline void LoadIntoVector(std::string value, std::vector<sf::Vector2i>& into)
 	{
@@ -65,6 +65,17 @@ public:
 		if (posStream >> x >> y) 
 		{
 			into.emplace_back(x, y);
+		}
+	}
+
+	static inline void LoadIntoVec2(std::string value, sf::Vector2i& into)
+	{
+		float x, y;
+		std::replace(value.begin(), value.end(), ';', ' ');
+		std::istringstream posStream(value);
+		if (posStream >> x >> y)
+		{
+			into = sf::Vector2i(x, y);
 		}
 	}
 
@@ -154,6 +165,10 @@ public:
 				else if (key == "ButtonBlockPositions")
 				{
 					LoadIntoVector(value, ButtonBlockPositions);
+				}
+				else if (key == "BaseBackgroundBlock")
+				{
+					LoadIntoVec2(value, BaseBackgroundBlock);
 				}
 				else if (key == "LaserBlockPositions")
 				{
@@ -852,12 +867,11 @@ public:
 					Obstacle* on = nullptr;
 
 					//napraw level to more dynamic
-					//napraw blok bazowy
 
 					bool nocoll = false;
 
 
-					for (sf::Vector2i& pos : Flags::WinBlockPositions) // to fix empty block position
+					for (sf::Vector2i& pos : Flags::WinBlockPositions)
 					{
 						if (pos.x == textureRect.left / Flags::BlockSizePixels && pos.y == textureRect.top / Flags::BlockSizePixels)
 						{
@@ -894,8 +908,7 @@ public:
 							obs1->me.setScale(Flags::BlockScale, Flags::BlockScale);
 							obs1->me.setPosition(x * Flags::BlockScale * Flags::BlockSizePixels, y * Flags::BlockSizePixels * Flags::BlockScale);
 
-							//TO FIX
-							obs1->me.setTextureRect(sf::IntRect(8 * Flags::BlockSizePixels, 4 * Flags::BlockSizePixels, Flags::BlockSizePixels, Flags::BlockSizePixels));
+							obs1->me.setTextureRect(sf::IntRect(Flags::BaseBackgroundBlock.x* Flags::BlockSizePixels, Flags::BaseBackgroundBlock.y * Flags::BlockSizePixels, Flags::BlockSizePixels, Flags::BlockSizePixels));
 
 							Object* obs2 = GetScene()->CreateObject(t_tex); // cat
 							obs2->Layer = b2;
@@ -972,7 +985,7 @@ public:
 						}
 					}
 
-					for (sf::Vector2i& pos : Flags::LaserRayBlockPositions) // Laser do zmiany pozycji, ten morduje, napraw blok z tylu
+					for (sf::Vector2i& pos : Flags::LaserRayBlockPositions) // Laser do zmiany pozycji, ten morduje
 					{
 						if (pos.x == textureRect.left / Flags::BlockSizePixels && pos.y == textureRect.top / Flags::BlockSizePixels)
 						{
@@ -992,8 +1005,7 @@ public:
 							obs1->me.setScale(Flags::BlockScale, Flags::BlockScale);
 							obs1->me.setPosition(x* Flags::BlockScale* Flags::BlockSizePixels, y* Flags::BlockSizePixels* Flags::BlockScale);
 
-							//TO FIX
-							obs1->me.setTextureRect(sf::IntRect(8 * Flags::BlockSizePixels, 4 * Flags::BlockSizePixels, Flags::BlockSizePixels, Flags::BlockSizePixels));
+							obs1->me.setTextureRect(sf::IntRect(Flags::BaseBackgroundBlock.x * Flags::BlockSizePixels, Flags::BaseBackgroundBlock.y* Flags::BlockSizePixels, Flags::BlockSizePixels, Flags::BlockSizePixels));
 
 
 							specialEffectsMap[effectorMap.getPixel(x, y)]->Rays.push_back((LaserObstacle*)on);
@@ -1002,7 +1014,7 @@ public:
 						}
 					}
 
-					for (sf::Vector2i& pos : Flags::NoCollideBlockPositions) // die to fix kolizje
+					for (sf::Vector2i& pos : Flags::NoCollideBlockPositions) 
 					{
 						if (pos.x == textureRect.left / Flags::BlockSizePixels && pos.y == textureRect.top / Flags::BlockSizePixels)
 						{
