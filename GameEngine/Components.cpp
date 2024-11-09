@@ -24,6 +24,14 @@ void LaserObstacle::Do()
 {
 	Holder->GetScene()->GetGame()->ChangeScene(new MainScene());
 }
+#ifdef MapLoaderOn
+void MapLoader::Do()
+{
+	GetScene()->GetGame()->ChangeScene(new MainScene());
+}
+#endif // MapLoaderOn
+
+
 void DeadObstacle::Do()
 {
 	Holder->GetScene()->GetGame()->ChangeScene(new MainScene());

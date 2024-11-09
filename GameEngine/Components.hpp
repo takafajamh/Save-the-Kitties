@@ -14,16 +14,38 @@
 #include <unordered_map>
 #include <string>
 
+
+#define MapLoaderOn
+
 ///todo
 /*
 Credits
+
 Settings
+	sounds
+	music
+	hard mode~
+	cheat mode?~
+	Simple colors mode?
+
 Pause menu?
+	Sounds
+	Music
+	Leave
+
+Timer
+Death counter
+Jump indicator
+Cheatmode!
+
 Better cat release
-
-blok bazowy do configu
 level name pattern
+Fix colliders
 
+Add lore
+Add secret parts of the rooms?
+
+Wall jumps on soft stuff
 
 */
 
@@ -194,8 +216,6 @@ public:
 
 };
 
-
-inline int dst = 0;
 
 class MusicHandler : public Object
 {
@@ -731,13 +751,75 @@ struct ColorHash
 	}
 };
 
+
+#ifdef MapLoaderOn
+inline sf::Vector2f posix;
+#endif 
+
+
 class MapLoader : public Object
 {
 public:
-	void Update()
+	float speed = 800;
+
+#ifdef MapLoaderOn
+	MapLoader()
 	{
+		if (posix.x != 0)
+		{
+			sf::View v = window.getDefaultView();
+			sf::View v1 = window.getDefaultView();
+
+			v.setSize(v1.getSize() * 3.0f);
+			v.setCenter(posix);
+			window.setView(v);
+		}
+		
+		
+
 
 	}
+#endif // MapLoaderOn
+
+
+	void Update()
+	{
+#ifdef MapLoaderOn
+
+		sf::View v = window.getView();
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		{
+			v.move(0, (int)(speed * -dt));
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+		{
+			v.move(0, (int)(speed * dt));
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		{
+			v.move((int)(speed * -dt), 0);
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+		{
+			v.move((int)(speed * dt), 0);
+		}
+
+		posix = v.getCenter();
+
+		window.setView(v);
+
+		Do();
+		
+#endif
+	}
+
+#ifdef MapLoaderOn
+	void Do();
+#endif // MapLoaderOn
+
+	
+
 	void Draw()
 	{
 
@@ -1045,6 +1127,8 @@ public:
 
 		return obstacles;
 	}
+
+
 };
 
 class CatMove : public Component
@@ -1201,6 +1285,9 @@ public:
 
 	void Camera()
 	{
+
+
+
 		sf::View v = window.getDefaultView();
 
 		v.setCenter(Holder->me.getPosition().x + 200, Holder->me.getPosition().y);
@@ -1315,7 +1402,9 @@ public:
 	
 	void Update()
 	{
-
+#ifdef MapLoaderOn
+		return;
+#endif
 		switch (catState)
 		{
 		case CatMove::Standing:
