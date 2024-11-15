@@ -5,9 +5,14 @@
 #define tell(x) std::cout<<x<<std::endl
 #define say(x) std::cout<<x
 
-#define ShowColliders
+#define ShowCollidersOff
 #define MapLoaderOff
-#define StateLevel
+#define StateLevelOff
+
+
+#ifdef StateLevel
+inline bool ShowedColliders = false;;
+#endif // StateLevel
 
 
 #ifdef ShowColliders

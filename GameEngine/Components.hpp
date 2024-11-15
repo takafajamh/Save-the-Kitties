@@ -54,6 +54,8 @@ Wall jumps on soft stuff
 class Flags
 {
 public:
+	static inline float LevelTime[20] = { 0 };
+
 	static inline int LevelCount = 0;
 
 	static inline int MusicVolume = 50;
@@ -235,7 +237,6 @@ public:
 
 };
 
-
 class MusicHandler : public Object
 {
 public:
@@ -373,8 +374,21 @@ public:
 	PlayButton(sf::Texture* defaultTex, sf::Texture* hoverTex)
 		: Button(defaultTex, hoverTex) {}
 
-	void onClick();
+	virtual void onClick();
 
+};
+
+class RestartButton : public PlayButton
+{
+public:
+	RestartButton(sf::Texture* defaultTex, sf::Texture* hoverTex)
+		: PlayButton(defaultTex, hoverTex) {}
+
+	virtual void onClick()
+	{
+		Flags::LevelTime[Flags::LevelCount] = 0;
+		PlayButton::onClick();
+	}
 };
 
 class QuitButton : public Button
@@ -561,6 +575,36 @@ public:
 
 };
 
+class Timer : public Text
+{
+public:
+	float time = 0;
+	sf::Vector2i pos = sf::Vector2i(10,10);
+	Timer() : Text("text", sf::Vector2f(2,2))
+	{
+
+	}
+
+
+	void Update()
+	{
+		Text::Update();
+
+		if (!Active)
+			return;
+
+		sf::Vector2f newPos = window.mapPixelToCoords(pos);
+		me.setPosition(newPos);
+
+		Flags::LevelTime[Flags::LevelCount] += dt;
+	
+		std::string sText = std::to_string(std::round(Flags::LevelTime[Flags::LevelCount] * 100.0f) / 100.0f);
+
+		sText.erase(sText.find('.') + 3);
+		m_text.setString(sText);
+
+	}
+};
 
 
 template <class T>
@@ -907,8 +951,14 @@ public:
 		if (s == nullptr)
 			return;
 
+		Flags::LevelTime[Flags::LevelCount] -= dt;
+
 		if (time > 2.3f)
+		{
 			Do();
+			Flags::LevelCount++;
+		}
+			
 
 		time += dt;
 
@@ -920,7 +970,7 @@ public:
 	{
 		if (s != nullptr)
 			return;
-		Flags::LevelCount++;
+		
 		s = to;
 		s->Layer = Foreground;
 		Holder->GetScene()->sorted = false;
@@ -940,38 +990,6 @@ public:
 	void Draw()
 	{
 		if (ToDraw) window.draw(me);
-	}
-
-};
-
-class WinCondition : public Object
-{
-public:
-	ToDrawObject* other;
-	float WinTime = 3;
-	float time = 0;
-	bool won = false;
-	int level = 0;
-
-	void Collide()
-	{
-		other->ToDraw = true;
-		won = true;
-		if (Flags::LevelCount < level)
-			Flags::LevelCount = level;
-	}
-	void Update()
-	{
-		if (!won)
-			return;
-
-
-
-		time += dt;
-		if (time >= WinTime)
-		{
-			//change scene
-		}
 	}
 
 };
@@ -1012,7 +1030,7 @@ public:
 	MusicVolumeButton* mvb_down;
 	Text* t_mdo;
 
-	PlayButton* restart;
+	RestartButton* restart;
 	Text* t_re;
 	ContinueButton* continueBtn;
 	Text* t_co;

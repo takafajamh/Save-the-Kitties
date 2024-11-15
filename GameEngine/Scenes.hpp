@@ -105,7 +105,7 @@ public:
 		t_re->Layer = UIFront;
 		t_re->m_text.setCharacterSize(80);
 
-		PlayButton* pb = (PlayButton*)AddObject(new PlayButton(no, yes));
+		RestartButton* pb = (RestartButton*)AddObject(new RestartButton(no, yes));
 		pb->Layer = UI;
 		pb->me.setPosition(520, 320);
 		pb->me.setScale(3, 3);
@@ -215,10 +215,13 @@ public:
 	void Create() override
 	{
 #ifdef StateLevel
-		
-		tell("Which level you want to play?");
-		std::cin >> Flags::LevelCount;
-#endif // StateLevel
+		if (!ShowedColliders)
+		{
+			ShowedColliders = true;
+			tell("Which level you want to play?");
+			std::cin >> Flags::LevelCount;
+		}
+#endif // StateLeve
 
 
 
@@ -266,8 +269,13 @@ public:
 		Cat->me.setPosition(ml->catPosition.x, ml->catPosition.y - 20);
 
 
+
 		AddPauzeScreen();
 
+
+		Timer* t_timer = (Timer*)AddObject(new Timer());
+		t_timer->Layer = UIFront;
+		t_timer->m_text.setCharacterSize(52);
 
 
 	}

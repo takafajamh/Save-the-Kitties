@@ -38,6 +38,7 @@ void DeadObstacle::Do()
 }
 void MenuButton::onClick()
 {
+	Flags::LevelTime[Flags::LevelCount] = 0;
 	GetScene()->GetGame()->ChangeScene(new Menu());
 }
 
