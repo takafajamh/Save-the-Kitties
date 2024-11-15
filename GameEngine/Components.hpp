@@ -955,6 +955,7 @@ public:
 
 		if (time > 2.3f)
 		{
+			tell( "Poziom " << Flags::LevelCount << " t = " << Flags::LevelTime[Flags::LevelCount]);
 			Do();
 			Flags::LevelCount++;
 		}
