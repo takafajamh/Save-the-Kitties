@@ -86,13 +86,146 @@ class Menu : public Scene
 class MainScene : public Scene
 {
 public:
+
+	void AddPauzeScreen()
+	{
+		sf::Texture* no = CreateTexture("GPX/noClick.png");
+		sf::Texture* yes = CreateTexture("GPX/Click.png");
+
+		sf::Texture* stuff = CreateTexture("GPX/pauzaScreen.png");
+
+		PauseScreen* ps = (PauseScreen*)AddObject(new PauseScreen());
+		ps->me.setTexture(*stuff);
+		ps->me.setScale(1, 1);
+		ps->Layer = UIBack;
+		ps->pos = sf::Vector2i(430, 80);
+
+
+		Text* t_re = (Text*)AddObject(new Text("Restart", sf::Vector2f(560, 323)));
+		t_re->Layer = UIFront;
+		t_re->m_text.setCharacterSize(80);
+
+		PlayButton* pb = (PlayButton*)AddObject(new PlayButton(no, yes));
+		pb->Layer = UI;
+		pb->me.setPosition(520, 320);
+		pb->me.setScale(3, 3);
+
+		ps->restart = pb;
+		ps->t_re = t_re;
+
+
+
+		Text* t_co = (Text*)AddObject(new Text("Continue", sf::Vector2f(560, 323)));
+		t_co->Layer = UIFront;
+		t_co->m_text.setCharacterSize(80);
+
+		ContinueButton* cb = (ContinueButton*)AddObject(new ContinueButton(no, yes));
+		cb->Layer = UI;
+		cb->me.setPosition(520, 320);
+		cb->me.setScale(3, 3);
+
+		ps->continueBtn = cb;
+		ps->t_co = t_co;
+
+
+		Text* t_mu = (Text*)AddObject(new Text("UP", sf::Vector2f(560, 323)));
+		t_mu->Layer = UIFront;
+		t_mu->m_text.setCharacterSize(80);
+
+		MusicVolumeButton* mvbu = (MusicVolumeButton*)AddObject(new MusicVolumeButton(no, yes, true));
+		mvbu->Layer = UI;
+		mvbu->me.setPosition(520, 320);
+		mvbu->me.setScale(3, 3);
+
+
+		ps->mvb_up = mvbu;
+		ps->t_mup = t_mu;
+
+
+		Text* t_md = (Text*)AddObject(new Text("DOWN", sf::Vector2f(560, 323)));
+		t_md->Layer = UIFront;
+		t_md->m_text.setCharacterSize(80);
+
+		MusicVolumeButton* mvbd = (MusicVolumeButton*)AddObject(new MusicVolumeButton(no, yes, false));
+		mvbd->Layer = UI;
+		mvbd->me.setPosition(520, 320);
+		mvbd->me.setScale(3, 3);
+
+
+		ps->mvb_down = mvbd;
+		ps->t_mdo = t_md;
+
+
+
+		Text* t_su = (Text*)AddObject(new Text("UP", sf::Vector2f(560, 323)));
+		t_su->Layer = UIFront;
+		t_su->m_text.setCharacterSize(80);
+
+		SoundsVolumeButton* svbu = (SoundsVolumeButton*)AddObject(new SoundsVolumeButton(no, yes, true));
+		svbu->Layer = UI;
+		svbu->me.setPosition(520, 320);
+		svbu->me.setScale(3, 3);
+
+
+		ps->svb_up = svbu;
+		ps->t_sup = t_su;
+
+
+		Text* t_sd = (Text*)AddObject(new Text("DOWN", sf::Vector2f(560, 323)));
+		t_sd->Layer = UIFront;
+		t_sd->m_text.setCharacterSize(80);
+
+		SoundsVolumeButton* svbd = (SoundsVolumeButton*)AddObject(new SoundsVolumeButton(no, yes, false));
+		svbd->Layer = UI;
+		svbd->me.setPosition(520, 320);
+		svbd->me.setScale(3, 3);
+
+		ps->svb_down = svbd;
+		ps->t_sdo = t_sd;
+
+
+		SoundText* st = (SoundText*)AddObject(new SoundText("ss",sf::Vector2f(0,0)));
+		ps->sot = st;
+		st->Layer = UIFront;
+
+		MusicText* mt = (MusicText*)AddObject(new MusicText("ss", sf::Vector2f(0, 0)));
+		ps->mut = mt;
+		mt->Layer = UIFront;
+
+
+
+		Text* t_me = (Text*)AddObject(new Text("Menu", sf::Vector2f(560, 323)));
+		t_me->Layer = UIFront;
+		t_me->m_text.setCharacterSize(80);
+
+		MenuButton* mbtn = (MenuButton*)AddObject(new MenuButton(no, yes));
+		mbtn->Layer = UI;
+		mbtn->me.setPosition(520, 320);
+		mbtn->me.setScale(3, 3);
+
+
+		ps->menuBtn = mbtn;
+		ps->t_me = t_me;
+
+
+		ps->Clean();
+		
+	}
+
 	void Create() override
 	{
+#ifdef StateLevel
+		
+		tell("Which level you want to play?");
+		std::cin >> Flags::LevelCount;
+#endif // StateLevel
 
+
+
+		Flags::Stop = false;
 		sf::Texture* t_cat = CreateTexture("GPX/cat_alt-Sheet.png");
 
 		Object* Cat = CreateObject(t_cat);
-		Cat->me.setPosition(200, 24 * 64*2);
 		Cat->me.setScale(2, 2);
 
 		Animator* anim_cat = (Animator*)Cat->AddComponent(new Animator());
@@ -120,15 +253,20 @@ public:
 			cmove_cat->obstacles = ml->GenerateMap("GPX/Levels/level3.png", "GPX/Levels/level3-rays.png");
 			break;
 		case 4:
-			GetGame()->ChangeScene(new Win());
-			//cmove_cat->obstacles = ml->GenerateMap("GPX/level4.png");
+			cmove_cat->obstacles = ml->GenerateMap("GPX/Levels/level4.png", "GPX/Levels/level4-rays.png");
+			break;
+		case 5:
+			cmove_cat->obstacles = ml->GenerateMap("GPX/Levels/level5.png", "GPX/Levels/level5-rays.png");
 			break;
 		default:
 			GetGame()->ChangeScene(new Win());
 			break;
 		}
 		
+		Cat->me.setPosition(ml->catPosition.x, ml->catPosition.y - 20);
 
+
+		AddPauzeScreen();
 
 
 

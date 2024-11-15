@@ -15,7 +15,8 @@
 #include <string>
 
 
-#define MapLoaderOn
+
+
 
 ///todo
 /*
@@ -55,6 +56,11 @@ class Flags
 public:
 	static inline int LevelCount = 0;
 
+	static inline int MusicVolume = 50;
+	static inline int SoundsVolume = 50;
+
+	static inline bool Stop = false;
+
 	// Cat parameters
 	static inline float catSpeed = 0.0f;
 	static inline float catMaxSpeed = 0.0f;
@@ -66,8 +72,13 @@ public:
 
 	// Map parameters
 	static inline std::vector<sf::Vector2i> WinBlockPositions;
-	static inline std::vector<sf::Vector2i> DeadBlockPositions;
-	static inline std::vector<sf::Vector2i> DeadBlockPositionsReverse;
+	static inline std::vector<sf::Vector2i> DeadBlockPositionsD;
+	static inline std::vector<sf::Vector2i> DeadBlockPositionsU;
+	static inline std::vector<sf::Vector2i> DeadBlockPositionsL;
+	static inline std::vector<sf::Vector2i> DeadBlockPositionsR;
+
+
+
 	static inline std::vector<sf::Vector2i> NoCollideBlockPositions;
 	static inline std::vector<sf::Vector2i> ButtonBlockPositions;
 	static inline std::vector<sf::Vector2i> LaserBlockPositions;
@@ -172,13 +183,21 @@ public:
 				{
 					LoadIntoVector(value, WinBlockPositions);
 				}
-				else if (key == "DeadBlockPositions")
+				else if (key == "DeadBlockPositionsD")
 				{
-					LoadIntoVector(value, DeadBlockPositions);
+					LoadIntoVector(value, DeadBlockPositionsD);
 				}
-				else if (key == "DeadBlockPositionsReverse")
+				else if (key == "DeadBlockPositionsU")
 				{
-					LoadIntoVector(value, DeadBlockPositionsReverse);
+					LoadIntoVector(value, DeadBlockPositionsU);
+				}
+				else if (key == "DeadBlockPositionsR")
+				{
+					LoadIntoVector(value, DeadBlockPositionsR);
+				}
+				else if (key == "DeadBlockPositionsL")
+				{
+					LoadIntoVector(value, DeadBlockPositionsL);
 				}
 				else if (key == "NoCollideBlockPositions")
 				{
@@ -220,8 +239,6 @@ public:
 class MusicHandler : public Object
 {
 public:
-	float volume = 50;
-
 	bool u = false;
 	bool d = false;
 
@@ -236,7 +253,11 @@ public:
 			if (u)
 			{
 				u = false;
-				volume += 10;
+				Flags::MusicVolume += 10;
+
+				if (Flags::MusicVolume > 100)
+					Flags::MusicVolume = 100;
+
 			}
 		}
 
@@ -249,11 +270,15 @@ public:
 			if (d)
 			{
 				d = false;
-				volume -= 10;
+				Flags::MusicVolume -= 10;
+
+				if (Flags::MusicVolume < 00)
+					Flags::MusicVolume = 00;
+
 			}
 		}
 
-		GetScene()->GetGame()->music.setVolume(volume);
+		GetScene()->GetGame()->music.setVolume(Flags::MusicVolume);
 	}
 };
 
@@ -264,8 +289,11 @@ protected:
 	sf::Texture* hoverTexture = nullptr;
 	bool isHovered = false;
 	bool wasClicked = false;
-
+	bool firstClick = true;
 public:
+
+	bool Active = true;
+
 	Button(sf::Texture* defaultTex, sf::Texture* hoverTex)
 	{
 		defaultTexture = defaultTex;
@@ -274,8 +302,23 @@ public:
 	}
 
 
-	void Update() override
+	virtual void Update() override
 	{
+		if (firstClick)
+		{
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			{
+				return;
+			}
+			else
+			{
+				firstClick = false;
+			}
+		}
+		
+		if (!Active)
+			return;
+
 		sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 		sf::Vector2f worldPos = window.mapPixelToCoords(mousePos);
 
@@ -315,6 +358,9 @@ public:
 
 	void Draw() override
 	{
+		if (!Active)
+			return;
+
 		window.draw(me);
 	}
 
@@ -337,15 +383,113 @@ public:
 	QuitButton(sf::Texture* defaultTex, sf::Texture* hoverTex)
 		: Button(defaultTex, hoverTex) {}
 
+
 	void onClick();
 
 };
+
+
+class MusicVolumeButton : public Button
+{
+public:
+	bool Up;
+
+	MusicVolumeButton(sf::Texture* defaultTex, sf::Texture* hoverTex, bool up)
+		: Button(defaultTex, hoverTex) 
+	{
+		Up = up;
+	}
+
+	void onClick() 
+	{
+		if (Up)
+		{
+			Flags::MusicVolume += 5;
+
+			if (Flags::MusicVolume > 100)
+				Flags::MusicVolume = 100;
+		}
+		else
+		{
+			Flags::MusicVolume -= 5;
+
+			if (Flags::MusicVolume < 0)
+				Flags::MusicVolume = 0;
+		}
+		GetScene()->GetGame()->music.setVolume(Flags::MusicVolume);
+			
+	}
+};
+
+class SoundsVolumeButton : public Button
+{
+public:
+	bool Up;
+
+	SoundsVolumeButton(sf::Texture* defaultTex, sf::Texture* hoverTex, bool up)
+		: Button(defaultTex, hoverTex) 
+	{
+		Up = up;
+	}
+
+	void onClick()
+	{
+		if (Up)
+		{
+			Flags::SoundsVolume += 5;
+
+			if (Flags::SoundsVolume > 100)
+				Flags::SoundsVolume = 100;
+		}
+		else
+		{
+			Flags::SoundsVolume -= 5;
+
+			if (Flags::SoundsVolume < 0)
+				Flags::SoundsVolume = 0;
+		}
+
+		GetScene()->GetGame()->music.setVolume(Flags::SoundsVolume);
+
+	}
+};
+
+class ContinueButton : public Button
+{
+public:
+	bool Continue = false;
+	ContinueButton(sf::Texture* defaultTex, sf::Texture* hoverTex)
+		: Button(defaultTex, hoverTex) {}
+
+	void onClick()
+	{
+		Continue = true;
+
+
+	}
+};
+
+class MenuButton : public Button
+{
+public:
+	MenuButton(sf::Texture* defaultTex, sf::Texture* hoverTex)
+		: Button(defaultTex, hoverTex) {}
+
+	void onClick();
+};
+
+
+
+
 
 class Text : public Object
 {
 public:
 	sf::Text m_text;
 	sf::Font font;
+
+	bool Active = true;
+
 	Text(std::string text, sf::Vector2f pos)
 	{
 		font.loadFromFile("Font/munro.ttf");
@@ -357,16 +501,67 @@ public:
 		m_text.setPosition(pos);
 		m_text.setFont(font);
 	}
-	void Update()
+	virtual void Update()
 	{
-		Object::Update();
+		if(Active)
+			Object::Update();
 	}
 	void Draw()
 	{
+		if (!Active)
+			return;
+
 		m_text.setPosition(me.getPosition());
 		window.draw(m_text);
+
 	}
 };
+
+
+class SoundText : public Text
+{
+public:
+	SoundText(std::string text, sf::Vector2f pos) : Text(text, pos)
+	{
+
+	}
+
+
+	void Update()
+	{
+		Text::Update();
+
+		if (!Active)
+			return;
+
+		m_text.setString(std::to_string(Flags::SoundsVolume));
+	}
+
+};
+
+class MusicText : public Text
+{
+public:
+	MusicText(std::string text, sf::Vector2f pos) : Text(text, pos)
+	{
+
+	}
+
+
+	void Update()
+	{
+		Text::Update();
+
+		if (!Active)
+			return;
+
+		m_text.setString(std::to_string(Flags::MusicVolume));
+
+	}
+
+};
+
+
 
 template <class T>
 class LevelButton : public Button
@@ -549,13 +744,60 @@ class Obstacle : public Component
 {
 public:
 	sf::FloatRect collider;
-	int height_minus = 0;
-	int htop = 0;
+	enum Mode 
+	{
+		fullblock,
+		L,
+		R,
+		D,
+		U
+	};
+
+	int width = (2 *  Flags::BlockSizePixels / 3) * Flags::BlockScale;
+
+	Mode colliderMode = fullblock;
+
 	virtual void Update()
 	{
 		collider = Holder->me.getGlobalBounds();
-		collider.height -= height_minus;
-		collider.top += height_minus - htop;
+		switch (colliderMode)
+		{
+		case Obstacle::L:
+			collider.width -= width;
+			collider.height -= width;
+
+			collider.top += width / 4;
+
+			break;
+		case Obstacle::R:
+			collider.width -= width;
+			collider.height -= width;
+
+			collider.top += width / 4;
+			collider.left += width / 2;
+			break;
+		case Obstacle::D:
+			collider.width -= width;
+			collider.height -= width;
+
+			collider.top += width / 2;
+			collider.left += width / 4;
+			break;
+		case Obstacle::U:
+			collider.width -= width;
+			collider.height -= width;
+
+			collider.left += width / 4;
+			break;
+		default:
+			break;
+		}
+
+#ifdef ShowColliders
+		ColliderRects.push_back(collider);
+#endif // ShowColliders
+
+
 	}
 	virtual void Collide()
 	{
@@ -584,9 +826,7 @@ public:
 
 	void Update()
 	{
-		collider = Holder->me.getGlobalBounds();
-		collider.height -= height_minus;
-		collider.top += height_minus - htop;
+		Obstacle::Update();
 	}
 
 	virtual void Collide() override
@@ -605,9 +845,7 @@ public:
 
 	void Update()
 	{
-		collider = Holder->me.getGlobalBounds();
-		collider.height -= height_minus;
-		collider.top += height_minus - htop;
+		Obstacle::Update();
 	}
 	virtual void Collide() override
 	{
@@ -629,7 +867,7 @@ public:
 		if (done)
 			return;
 
-		htop = height_minus;
+		Obstacle::Update();
 
 		done = true;
 		sf::IntRect a = Holder->me.getTextureRect();
@@ -645,7 +883,7 @@ public:
 		{
 			((Animator*)(l1o->Holder->GetComponents()[1]))->Stop();
 			sf::IntRect a = l1o->Holder->me.getTextureRect();
-			l1o->Holder->me.setTextureRect(sf::IntRect(Flags::BlockSizePixels * 8, a.top, Flags::BlockSizePixels, Flags::BlockSizePixels));
+			l1o->Holder->me.setTextureRect(sf::IntRect(a.left + (Flags::BlockSizePixels * 2), a.top, Flags::BlockSizePixels, Flags::BlockSizePixels));
 		}
 
 	}
@@ -663,9 +901,7 @@ public:
 	
 	void Update()
 	{
-		collider = Holder->me.getGlobalBounds();
-		collider.height -= height_minus;
-		collider.top += height_minus - htop;
+		Obstacle::Update();
 
 
 		if (s == nullptr)
@@ -757,10 +993,195 @@ inline sf::Vector2f posix;
 #endif 
 
 
+
+
+class PauseScreen : public Object
+{
+public:
+	sf::Vector2i pos;
+
+	bool Run = false;
+
+	SoundsVolumeButton* svb_up;
+	Text* t_sup;
+	SoundsVolumeButton* svb_down;
+	Text* t_sdo;
+
+	MusicVolumeButton* mvb_up;
+	Text* t_mup;
+	MusicVolumeButton* mvb_down;
+	Text* t_mdo;
+
+	PlayButton* restart;
+	Text* t_re;
+	ContinueButton* continueBtn;
+	Text* t_co;
+
+	MenuButton* menuBtn;
+	Text* t_me;
+
+	SoundText* sot;
+	MusicText* mut;
+
+
+	bool clicked = false;
+
+	void Draw()
+	{
+		if(Run)
+			window.draw(me);
+	}
+
+	void Clean()
+	{
+		sot->Active = false;
+		mut->Active = false;
+
+		svb_up->Active = false;
+		svb_down->Active = false;
+		mvb_up->Active = false;
+		mvb_down->Active = false;
+		restart->Active = false;
+		continueBtn->Active = false;
+
+		t_mup->Active = false;
+		t_sup->Active = false;
+		t_mdo->Active = false;
+		t_sdo->Active = false;
+		t_re->Active = false;
+		t_co->Active = false;
+
+		menuBtn->Active = false;
+		mut->Active = false;
+		t_me->Active = false;
+		
+	}
+
+	void UnClean()
+	{
+		me.setPosition(window.mapPixelToCoords(pos));
+		sf::Vector2f Base = me.getPosition();
+
+		sot->Active = true;
+		mut->Active = true;
+
+
+		menuBtn->Active = true;
+		t_me->Active = true;
+
+		svb_up->Active = true;
+		svb_down->Active = true;
+		mvb_up->Active = true;
+		mvb_down->Active = true;
+		restart->Active = true;
+		continueBtn->Active = true;
+		continueBtn->Continue = false;
+
+		t_mup->Active = true;
+		t_sup->Active = true;
+		t_mdo->Active = true;
+		t_sdo->Active = true;
+		t_re->Active = true;
+		t_co->Active = true;
+
+		svb_up->me.setPosition(Base.x + 188 + 8, Base.y + 112);
+		t_sup->me.setPosition(Base.x + 188 + 42, Base.y + 116);
+		t_sup->m_text.setCharacterSize(36);
+
+		svb_down->me.setPosition(Base.x + 8, Base.y + 112);
+		t_sdo->me.setPosition(Base.x + 4 + 24, Base.y + 117);
+		t_sdo->m_text.setCharacterSize(36);
+
+
+		sot->me.setPosition(Base.x + 82 + 50, Base.y + 116);
+		sot->m_text.setCharacterSize(36);
+
+
+		mvb_up->me.setPosition(Base.x + 188 + 8, Base.y + 212);
+		t_mup->me.setPosition(Base.x + 188 + 42, Base.y + 216);
+		t_mup->m_text.setCharacterSize(36);
+
+		mvb_down->me.setPosition(Base.x +  8, Base.y + 212);
+		t_mdo->me.setPosition(Base.x +  4 + 24, Base.y + 217);
+		t_mdo->m_text.setCharacterSize(36);
+
+		mut->me.setPosition(Base.x + 82 + 50, Base.y + 216);
+		mut->m_text.setCharacterSize(36);
+
+
+
+		continueBtn->me.setPosition(Base.x + 82 , Base.y + 272);
+		continueBtn->me.setScale(4, 4);
+		t_co->me.setPosition(Base.x + 82 + 15, Base.y + 283);
+		t_co->m_text.setCharacterSize(36);
+
+
+		restart->me.setPosition(Base.x + 82, Base.y + 352);
+		restart->me.setScale(4, 4);
+		t_re->me.setPosition(Base.x + 82 + 21, Base.y + 363);
+		t_re->m_text.setCharacterSize(36);
+
+		menuBtn->me.setPosition(Base.x + 82, Base.y + 432);
+		menuBtn->me.setScale(4, 4);
+		t_me->me.setPosition(Base.x + 82 + 31, Base.y + 443);
+		t_me->m_text.setCharacterSize(36);
+
+
+	}
+
+	void Update()
+	{
+		if (Run)
+		{
+			if (continueBtn->Continue)
+			{
+				Clean();
+				Run = false;
+				clicked = false;
+				Flags::Stop = false;
+			}
+
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+			{
+				clicked = true;
+			}
+			else
+			{
+				if (clicked)
+				{
+					clicked = false;
+					Clean();
+					Flags::Stop = false;
+					Run = false;
+				}
+			}
+		}
+		else
+		{
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+			{
+				clicked = true;
+			}
+			else
+			{
+				if (clicked)
+				{
+					clicked = false;
+					UnClean();
+					Flags::Stop = true;
+					Run = true;
+				}
+			}
+		}
+	}
+};
+
 class MapLoader : public Object
 {
 public:
 	float speed = 800;
+	sf::Vector2f catPosition;
 
 #ifdef MapLoaderOn
 	MapLoader()
@@ -875,7 +1296,16 @@ public:
 		if (!image.loadFromFile(path) || !effectorMap.loadFromFile(specialPath)) // load a map file
 		{
 			std::cerr << "Failed to load map image from path: " << path << "or " << specialPath << std::endl;
-		//	return obstacles;
+			return obstacles;
+		}
+
+		if (image.getSize().x != effectorMap.getSize().x || image.getSize().y != effectorMap.getSize().y)
+		{
+			std::cerr << "Ray map and normal map are of a different size!"<<std::endl;
+#ifndef MapLoaderOn
+			return obstacles;
+#endif // !MapLoaderOn
+			exit(-2);
 		}
 
 		sf::Vector2u imageSize = image.getSize();
@@ -888,6 +1318,21 @@ public:
 				sf::Color color = image.getPixel(x, y);
 
 				if (color.a == 0) continue;
+
+				if (color == sf::Color(0, 0, 0))
+				{
+					catPosition = sf::Vector2f(x * Flags::BlockScale * Flags::BlockSizePixels, y * Flags::BlockScale * Flags::BlockSizePixels);
+					
+					Object* obs1 = GetScene()->CreateObject(spriteSheet);
+					obs1->Layer = b3;
+					obs1->me.setScale(Flags::BlockScale, Flags::BlockScale);
+					obs1->me.setPosition(x * Flags::BlockScale * Flags::BlockSizePixels, y * Flags::BlockSizePixels * Flags::BlockScale);
+
+					obs1->me.setTextureRect(sf::IntRect(Flags::BaseBackgroundBlock.x * Flags::BlockSizePixels, Flags::BaseBackgroundBlock.y * Flags::BlockSizePixels, Flags::BlockSizePixels, Flags::BlockSizePixels));
+
+					
+					continue;
+				}
 
 				if (colorRectMap.find(color) != colorRectMap.end())
 				{
@@ -913,8 +1358,6 @@ public:
 
 							specialEffectsMap[effectorMap.getPixel(x, y)] = (DoObstacle*)on;
 
-							on->height_minus = Flags::BlockSizePixels * 1.8f;
-							on->htop = Flags::BlockSizePixels * 2.1f;
 
 							obstacles.emplace_back(on);
 						}
@@ -1007,8 +1450,16 @@ public:
 						}
 					}
 
+
+					float yAdjust = 0;
+					if (x % 2 == y % 2)
+					{
+						yAdjust = Flags::BlockSizePixels;
+					}
+	
+
 					
-					for (sf::Vector2i& pos : Flags::DeadBlockPositionsReverse)
+					for (sf::Vector2i& pos : Flags::DeadBlockPositionsU)
 					{
 						if (pos.x == textureRect.left / Flags::BlockSizePixels && pos.y == textureRect.top / Flags::BlockSizePixels)
 						{
@@ -1018,16 +1469,16 @@ public:
 							Animator* anim = (Animator*)obs->AddComponent(new Animator);
 
 							anim->anims.emplace_back("Idle", std::vector<Animation::Frame>({
-							Animation::Frame(sf::IntRect(textureRect.left, textureRect.top, Flags::BlockSizePixels, Flags::BlockSizePixels),0.15f),
-							Animation::Frame(sf::IntRect(textureRect.left + Flags::BlockSizePixels, textureRect.top, Flags::BlockSizePixels, Flags::BlockSizePixels),0.15f),
+							Animation::Frame(sf::IntRect(textureRect.left, textureRect.top + yAdjust, Flags::BlockSizePixels, Flags::BlockSizePixels),0.15f),
+							Animation::Frame(sf::IntRect(textureRect.left + Flags::BlockSizePixels, textureRect.top + yAdjust, Flags::BlockSizePixels, Flags::BlockSizePixels),0.15f),
 								}));
 							anim->Play("Idle");
 
-							on->height_minus = Flags::BlockSizePixels * 1.5f;
-							on->htop = Flags::BlockSizePixels * 1.2f;
+							on->colliderMode = Obstacle::Mode::U;
 						}
 					}
-					for (sf::Vector2i& pos : Flags::DeadBlockPositions)
+					
+					for (sf::Vector2i& pos : Flags::DeadBlockPositionsD)
 					{
 						if (pos.x == textureRect.left / Flags::BlockSizePixels && pos.y == textureRect.top / Flags::BlockSizePixels)
 						{
@@ -1037,12 +1488,50 @@ public:
 							Animator* anim = (Animator*)obs->AddComponent(new Animator);
 
 							anim->anims.emplace_back("Idle", std::vector<Animation::Frame>({
-							Animation::Frame(sf::IntRect(textureRect.left, textureRect.top, Flags::BlockSizePixels, Flags::BlockSizePixels),0.15f),
-							Animation::Frame(sf::IntRect(textureRect.left + Flags::BlockSizePixels, textureRect.top, Flags::BlockSizePixels, Flags::BlockSizePixels),0.15f),
+							Animation::Frame(sf::IntRect(textureRect.left, textureRect.top + yAdjust, Flags::BlockSizePixels, Flags::BlockSizePixels),0.15f),
+							Animation::Frame(sf::IntRect(textureRect.left + Flags::BlockSizePixels, textureRect.top + yAdjust, Flags::BlockSizePixels, Flags::BlockSizePixels),0.15f),
 								}));
 							anim->Play("Idle");
 
-							on->height_minus = Flags::BlockSizePixels * 1.5f;
+							on->colliderMode = Obstacle::Mode::D;
+						}
+					}
+					
+					for (sf::Vector2i& pos : Flags::DeadBlockPositionsL)
+					{
+						if (pos.x == textureRect.left / Flags::BlockSizePixels && pos.y == textureRect.top / Flags::BlockSizePixels)
+						{
+							nocoll = true;
+
+							on = static_cast<Obstacle*>(obs->AddComponent(new DeadObstacle()));
+							Animator* anim = (Animator*)obs->AddComponent(new Animator);
+
+							anim->anims.emplace_back("Idle", std::vector<Animation::Frame>({
+							Animation::Frame(sf::IntRect(textureRect.left, textureRect.top + yAdjust, Flags::BlockSizePixels, Flags::BlockSizePixels),0.15f),
+							Animation::Frame(sf::IntRect(textureRect.left + Flags::BlockSizePixels, textureRect.top + yAdjust, Flags::BlockSizePixels, Flags::BlockSizePixels),0.15f),
+								}));
+							anim->Play("Idle");
+
+							on->colliderMode = Obstacle::Mode::L;
+						}
+					}
+
+					for (sf::Vector2i& pos : Flags::DeadBlockPositionsR)
+					{
+						if (pos.x == textureRect.left / Flags::BlockSizePixels && pos.y == textureRect.top / Flags::BlockSizePixels)
+						{
+							nocoll = true;
+
+							on = static_cast<Obstacle*>(obs->AddComponent(new DeadObstacle()));
+							Animator* anim = (Animator*)obs->AddComponent(new Animator);
+
+							anim->anims.emplace_back("Idle", std::vector<Animation::Frame>({
+							Animation::Frame(sf::IntRect(textureRect.left, textureRect.top + yAdjust, Flags::BlockSizePixels, Flags::BlockSizePixels),0.15f),
+							Animation::Frame(sf::IntRect(textureRect.left + Flags::BlockSizePixels, textureRect.top + yAdjust, Flags::BlockSizePixels, Flags::BlockSizePixels),0.15f),
+								}));
+							anim->Play("Idle");
+
+							on->colliderMode = Obstacle::Mode::R;
 						}
 					}
 
@@ -1061,7 +1550,17 @@ public:
 								}));
 							anim->Play("Idle");
 
-							specialEffectsMap[effectorMap.getPixel(x, y)]->Shooters.push_back((Laser1Obstacle*)on);
+							if (specialEffectsMap.find(effectorMap.getPixel(x, y)) != specialEffectsMap.end())
+								specialEffectsMap[effectorMap.getPixel(x, y)]->Shooters.push_back((Laser1Obstacle*)on);
+
+
+							Object* obs1 = GetScene()->CreateObject(spriteSheet);
+							obs1->Layer = b3;
+							obs1->me.setScale(Flags::BlockScale, Flags::BlockScale);
+							obs1->me.setPosition(x* Flags::BlockScale* Flags::BlockSizePixels, y* Flags::BlockSizePixels* Flags::BlockScale);
+
+							obs1->me.setTextureRect(sf::IntRect(Flags::BaseBackgroundBlock.x* Flags::BlockSizePixels, Flags::BaseBackgroundBlock.y* Flags::BlockSizePixels, Flags::BlockSizePixels, Flags::BlockSizePixels));
+
 
 
 						}
@@ -1089,8 +1588,8 @@ public:
 
 							obs1->me.setTextureRect(sf::IntRect(Flags::BaseBackgroundBlock.x * Flags::BlockSizePixels, Flags::BaseBackgroundBlock.y* Flags::BlockSizePixels, Flags::BlockSizePixels, Flags::BlockSizePixels));
 
-
-							specialEffectsMap[effectorMap.getPixel(x, y)]->Rays.push_back((LaserObstacle*)on);
+							if (specialEffectsMap.find(effectorMap.getPixel(x, y)) != specialEffectsMap.end())
+								specialEffectsMap[effectorMap.getPixel(x, y)]->Rays.push_back((LaserObstacle*)on);
 
 
 						}
@@ -1108,7 +1607,9 @@ public:
 					{
 						if (pos.x == textureRect.left / Flags::BlockSizePixels && pos.y == textureRect.top / Flags::BlockSizePixels)
 						{
-							obs->KillMePlease = true;
+							if(obs)
+								obs->KillMePlease = true;
+							
 							obs = nullptr;
 							nocoll = true;
 						}
@@ -1386,6 +1887,10 @@ public:
 		col.height -= 28;
 		col.top += 28;
 
+#ifdef ShowColliders
+		ColliderRects.push_back(col);
+#endif // ShowColliders
+
 		for (Obstacle*& obs : obstacles)
 		{
 			if (obs->collider.intersects(col))
@@ -1405,6 +1910,10 @@ public:
 #ifdef MapLoaderOn
 		return;
 #endif
+
+		if (Flags::Stop)
+			return;
+
 		switch (catState)
 		{
 		case CatMove::Standing:
@@ -1559,6 +2068,9 @@ public:
 
 		HandleAnimation();
 		Camera();
+
+
+		
 	}
 
 };

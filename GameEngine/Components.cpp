@@ -36,6 +36,10 @@ void DeadObstacle::Do()
 {
 	Holder->GetScene()->GetGame()->ChangeScene(new MainScene());
 }
+void MenuButton::onClick()
+{
+	GetScene()->GetGame()->ChangeScene(new Menu());
+}
 
 void winObstacle::Do()
 {

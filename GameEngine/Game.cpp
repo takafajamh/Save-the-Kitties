@@ -9,6 +9,10 @@ void Game::ChangeScene(Scene* s)
 
 void Game::Update()
 {
+#ifdef ShowColliders
+	ColliderRects.clear();
+#endif
+
 	currentScene->Update();
 }
 
@@ -16,6 +20,23 @@ void Game::Draw()
 {
 	window.clear(sf::Color(140,130,140));
 	currentScene->Draw();
+
+#ifdef ShowColliders
+	for (sf::FloatRect& ir : ColliderRects)
+	{
+		sf::RectangleShape r;
+		r.setSize(sf::Vector2f(ir.width, ir.height));
+		r.setPosition(ir.left, ir.top);
+		r.setOutlineColor(sf::Color::Blue);
+		r.setOutlineThickness(3);
+		r.setFillColor(sf::Color::Transparent);
+
+
+		window.draw(r);
+	}
+#endif
+
+
 	window.display();
 }
 void Game::SceneChange()

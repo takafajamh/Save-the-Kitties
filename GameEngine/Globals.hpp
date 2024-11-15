@@ -5,6 +5,17 @@
 #define tell(x) std::cout<<x<<std::endl
 #define say(x) std::cout<<x
 
+#define ShowColliders
+#define MapLoaderOff
+#define StateLevel
+
+
+#ifdef ShowColliders
+inline std::vector<sf::FloatRect> ColliderRects;
+#endif // ShowColliders
+
+
+
 const inline bool F_MemoryEff = true;
 
 inline sf::RenderWindow window;
