@@ -22,6 +22,7 @@ void LevelButton<T>::onClick()
 
 void LaserObstacle::Do() 
 {
+	Flags::DeathCounter[Flags::LevelCount]++;
 	Holder->GetScene()->GetGame()->ChangeScene(new MainScene());
 }
 #ifdef MapLoaderOn
@@ -34,6 +35,7 @@ void MapLoader::Do()
 
 void DeadObstacle::Do()
 {
+	Flags::DeathCounter[Flags::LevelCount]++;
 	Holder->GetScene()->GetGame()->ChangeScene(new MainScene());
 }
 void MenuButton::onClick()

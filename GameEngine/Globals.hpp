@@ -11,7 +11,7 @@
 
 
 #ifdef StateLevel
-inline bool ShowedColliders = false;;
+inline bool ShowedColliders = false;
 #endif // StateLevel
 
 

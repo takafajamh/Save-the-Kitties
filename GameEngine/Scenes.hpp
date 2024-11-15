@@ -239,8 +239,52 @@ public:
 
 		MapLoader* ml = (MapLoader*)AddObject(new MapLoader());
 
-		//Flags::LevelCount = 3;
+		//Flags::LevelCount = 5;
 
+		std::string LevelPath = "GPX/Levels/level" + std::to_string(Flags::LevelCount) + ".png";
+		std::string LevelRaysPath = "GPX/Levels/level" + std::to_string(Flags::LevelCount) + "-rays.png";
+
+		std::ifstream file(LevelPath);
+		if (file.good())
+		{
+			std::string catPath;
+			switch (Flags::LevelCount)
+			{
+			case 0:
+				catPath = "GPX/Kass.png";
+				break;
+			case 1:
+				catPath = "GPX/Odoru..png";
+				break;
+			case 2:
+				catPath = "GPX/Liya.png";
+				break;
+			case 3:
+				catPath = "GPX/Carmen.png";
+				break;
+			case 4:
+				catPath = "GPX/bee.png";
+				break;
+			case 5:
+				catPath = "GPX/Liam.png";
+				break;
+			case 6:
+				catPath = "GPX/Maitake.png";
+				break;
+			default:
+				catPath = "GPX/Kass.png";
+				break;
+			}
+
+
+			cmove_cat->obstacles = ml->GenerateMap(LevelPath, LevelRaysPath, catPath);
+		}
+		else
+		{
+			GetGame()->ChangeScene(new Win());
+		}
+
+		/*
 		switch (Flags::LevelCount)
 		{
 		case 0:
@@ -261,10 +305,13 @@ public:
 		case 5:
 			cmove_cat->obstacles = ml->GenerateMap("GPX/Levels/level5.png", "GPX/Levels/level5-rays.png");
 			break;
+		case 6:
+			cmove_cat->obstacles = ml->GenerateMap("GPX/Levels/level6.png", "GPX/Levels/level6-rays.png");
+			break;
 		default:
 			GetGame()->ChangeScene(new Win());
 			break;
-		}
+		}*/
 		
 		Cat->me.setPosition(ml->catPosition.x, ml->catPosition.y - 20);
 

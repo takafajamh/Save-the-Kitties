@@ -29,18 +29,10 @@ Settings
 	cheat mode?~
 	Simple colors mode?
 
-Pause menu?
-	Sounds
-	Music
-	Leave
-
-Timer
-Death counter
 Jump indicator
 Cheatmode!
 
 Better cat release
-level name pattern
 Fix colliders
 
 Add lore
@@ -55,6 +47,7 @@ class Flags
 {
 public:
 	static inline float LevelTime[20] = { 0 };
+	static inline int DeathCounter[20] = { 0 };
 
 	static inline int LevelCount = 0;
 
@@ -955,7 +948,7 @@ public:
 
 		if (time > 2.3f)
 		{
-			tell( "Poziom " << Flags::LevelCount << " t = " << Flags::LevelTime[Flags::LevelCount]);
+			tell( "Poziom " << Flags::LevelCount << " t = " << Flags::LevelTime[Flags::LevelCount] << " Dead: " << Flags::DeathCounter[Flags::LevelCount]);
 			Do();
 			Flags::LevelCount++;
 		}
@@ -1300,9 +1293,10 @@ public:
 		return colorRectMap;
 	}
 
-	std::vector<Obstacle*> GenerateMap(const std::string& path, const std::string& specialPath)
+	std::vector<Obstacle*> GenerateMap(const std::string& path, const std::string& specialPath, const std::string& catPath)
 	{
 		sf::Texture* spriteSheet = GetScene()->CreateTexture(Flags::SheetPath);
+		sf::Texture* cattex = GetScene()->CreateTexture(catPath);
 
 		std::unordered_map<sf::Color, sf::IntRect, ColorHash> colorRectMap = LoadLegend(Flags::LegendPath);
 		std::unordered_map<sf::Color, DoObstacle*, ColorHash> specialEffectsMap;
@@ -1423,29 +1417,7 @@ public:
 							on = static_cast<Obstacle*>(obs->AddComponent(new winObstacle()));
 							winObstacle* oo = (winObstacle*)on;
 
-							sf::Texture* t_tex = nullptr;
-
-							switch (Flags::LevelCount)
-							{
-							case 0:
-								t_tex = obs->GetScene()->CreateTexture("GPX/Kass.png");
-								break;
-							case 1:
-								t_tex = obs->GetScene()->CreateTexture("GPX/Odoru..png");
-								break;
-							case 2:
-								t_tex = obs->GetScene()->CreateTexture("GPX/Liya.png");
-								break;
-							case 3:
-								t_tex = obs->GetScene()->CreateTexture("GPX/Carmen.png");
-								break;
-							case 4:
-								t_tex = obs->GetScene()->CreateTexture("GPX/bee.png");
-								break;
-							default:
-								t_tex = obs->GetScene()->CreateTexture("GPX/Kass.png");
-								break;
-							}
+							sf::Texture* t_tex = cattex;
 
 							Object* obs1 = GetScene()->CreateObject(spriteSheet);
 							obs1->Layer = b3;
