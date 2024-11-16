@@ -57,6 +57,15 @@ class Menu : public Scene
 		t1->Layer = UI;
 		t1->m_text.setCharacterSize(80);
 
+		Text* t21 = (Text*)AddObject(new Text("Settings", sf::Vector2f(62, 635)));
+		t21->Layer = UI;
+		t21->m_text.setCharacterSize(48);
+
+		SettingsButton* sb = (SettingsButton*)AddObject(new SettingsButton(no, yes));
+		sb->me.setPosition(42, 630);
+		sb->me.setScale(5, 4);
+
+
 		PlayButton* pb = new PlayButton(no, yes);
 		pb->me.setPosition(520, 320);
 		pb->me.setScale(6, 6);
@@ -82,6 +91,154 @@ class Menu : public Scene
 		
 	}
 };
+
+class Settings : public Scene
+{
+	void AddPauzeScreen()
+	{
+		sf::Texture* no = CreateTexture("GPX/noClick.png");
+		sf::Texture* yes = CreateTexture("GPX/Click.png");
+
+		sf::Texture* stuff = CreateTexture("GPX/pauzaScreen.png");
+
+		PauseScreen* ps = (PauseScreen*)AddObject(new PauseScreen());
+		ps->me.setTexture(*stuff);
+		ps->me.setScale(1, 1);
+		ps->Layer = UIBack;
+		ps->pos = sf::Vector2i(430, 80);
+
+
+
+
+		Text* t_me = (Text*)AddObject(new Text("Menu", sf::Vector2f(560, 323)));
+		t_me->Layer = UIFront;
+		t_me->m_text.setCharacterSize(80);
+
+		MenuButton* mbtn = (MenuButton*)AddObject(new MenuButton(no, yes));
+		mbtn->Layer = UI;
+		mbtn->me.setPosition(520, 320);
+		mbtn->me.setScale(3, 3);
+
+
+		ps->menuBtn = mbtn;
+		ps->t_me = t_me;
+
+
+		ps->Clean();
+
+	}
+
+	void AddMusic(sf::Texture* yes, sf::Texture* no)
+	{
+		Text* t_music = (Text*)AddObject(new Text("Music volume", sf::Vector2f(155, 105)));
+		t_music->Layer = UIFront;
+		t_music->m_text.setCharacterSize(48);
+
+
+		Text* t_mu = (Text*)AddObject(new Text("UP", sf::Vector2f(335, 205)));
+		t_mu->Layer = UIFront;
+		t_mu->m_text.setCharacterSize(36);
+
+		MusicVolumeButton* mvbu = (MusicVolumeButton*)AddObject(new MusicVolumeButton(no, yes, true));
+		mvbu->Layer = UI;
+		mvbu->me.setPosition(300, 200);
+		mvbu->me.setScale(3, 3);
+
+
+		Text* t_md = (Text*)AddObject(new Text("DOWN", sf::Vector2f(120, 205)));
+		t_md->Layer = UIFront;
+		t_md->m_text.setCharacterSize(36);
+
+		MusicVolumeButton* mvbd = (MusicVolumeButton*)AddObject(new MusicVolumeButton(no, yes, false));
+		mvbd->Layer = UI;
+		mvbd->me.setPosition(100, 200);
+		mvbd->me.setScale(3, 3);
+
+		MusicText* mt = (MusicText*)AddObject(new MusicText("ss", sf::Vector2f(240, 205)));
+		mt->Layer = UIFront;
+
+	}
+	
+	void AddSound(sf::Texture* yes, sf::Texture* no)
+	{
+		Text* t_music = (Text*)AddObject(new Text("Sound volume", sf::Vector2f(155, 305)));
+		t_music->Layer = UIFront;
+		t_music->m_text.setCharacterSize(48);
+
+
+		Text* t_mu = (Text*)AddObject(new Text("UP", sf::Vector2f(335, 405)));
+		t_mu->Layer = UIFront;
+		t_mu->m_text.setCharacterSize(36);
+
+		SoundsVolumeButton* mvbu = (SoundsVolumeButton*)AddObject(new SoundsVolumeButton(no, yes, true));
+		mvbu->Layer = UI;
+		mvbu->me.setPosition(300, 400);
+		mvbu->me.setScale(3, 3);
+
+
+		Text* t_md = (Text*)AddObject(new Text("DOWN", sf::Vector2f(120, 405)));
+		t_md->Layer = UIFront;
+		t_md->m_text.setCharacterSize(36);
+
+		SoundsVolumeButton* mvbd = (SoundsVolumeButton*)AddObject(new SoundsVolumeButton(no, yes, false));
+		mvbd->Layer = UI;
+		mvbd->me.setPosition(100, 400);
+		mvbd->me.setScale(3, 3);
+
+		SoundText* mt = (SoundText*)AddObject(new SoundText("ss", sf::Vector2f(240, 405)));
+		mt->Layer = UIFront;
+
+	}
+
+	void AddMenuBack(sf::Texture* yes, sf::Texture* no)
+	{
+		Text* t_me = (Text*)AddObject(new Text("Back", sf::Vector2f(42, 654)));
+		t_me->Layer = UIFront;
+		t_me->m_text.setCharacterSize(36);
+
+		MenuButton* mbtn = (MenuButton*)AddObject(new MenuButton(no, yes));
+		mbtn->Layer = UI;
+		mbtn->me.setPosition(20, 650);
+		mbtn->me.setScale(3, 3);
+	}
+	
+	void AddModes(sf::Texture* yes, sf::Texture* no)
+	{
+		FlagClickerButton* EasyMode = (FlagClickerButton*)AddObject(new FlagClickerButton(no, yes, &Flags::EasyMode));
+		EasyMode->Layer = UI;
+		EasyMode->me.setScale(3, 3);
+		EasyMode->me.setPosition(800, 200);
+
+		Text* t_me = (Text*)AddObject(new Text("Easy", sf::Vector2f(821, 204)));
+		t_me->Layer = UIFront;
+		t_me->m_text.setCharacterSize(36);
+
+
+	}
+
+	void Create()
+	{
+		Flags::LoadStats("config.txt");
+
+		sf::Texture* no = CreateTexture("GPX/noClick.png");
+		sf::Texture* yes = CreateTexture("GPX/Click.png");
+
+
+		Object* background = CreateObject("GPX/back.png");
+		background->me.setScale(3, 3);
+		background->me.setPosition(-50, -10);
+		background->Layer = Background;
+
+
+		AddMusic(yes,no);
+		AddSound(yes,no);
+		AddMenuBack(yes, no);
+		AddModes(yes, no);
+
+
+	}
+};
+
 
 class MainScene : public Scene
 {
@@ -239,7 +396,7 @@ public:
 
 		MapLoader* ml = (MapLoader*)AddObject(new MapLoader());
 
-		//Flags::LevelCount = 5;
+		Flags::LevelCount = 6;
 
 		std::string LevelPath = "GPX/Levels/level" + std::to_string(Flags::LevelCount) + ".png";
 		std::string LevelRaysPath = "GPX/Levels/level" + std::to_string(Flags::LevelCount) + "-rays.png";

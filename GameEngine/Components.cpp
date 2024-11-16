@@ -43,6 +43,11 @@ void MenuButton::onClick()
 	Flags::LevelTime[Flags::LevelCount] = 0;
 	GetScene()->GetGame()->ChangeScene(new Menu());
 }
+void SettingsButton::onClick()
+{
+	GetScene()->GetGame()->ChangeScene(new Settings());
+}
+
 
 void winObstacle::Do()
 {

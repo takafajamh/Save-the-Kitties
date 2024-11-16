@@ -22,12 +22,6 @@
 /*
 Credits
 
-Settings
-	sounds
-	music
-	hard mode~
-	cheat mode?~
-	Simple colors mode?
 
 Jump indicator
 Cheatmode!
@@ -37,6 +31,10 @@ Fix colliders
 
 Add lore
 Add secret parts of the rooms?
+	invisible blocks
+	When touched it shows
+	color based?
+	so 2 files...
 
 Wall jumps on soft stuff
 
@@ -55,6 +53,9 @@ public:
 	static inline int SoundsVolume = 50;
 
 	static inline bool Stop = false;
+
+	static inline bool EasyMode = false;
+
 
 	// Cat parameters
 	static inline float catSpeed = 0.0f;
@@ -371,6 +372,16 @@ public:
 
 };
 
+class SettingsButton : public Button
+{
+public:
+	SettingsButton(sf::Texture* defaultTex, sf::Texture* hoverTex)
+		: Button(defaultTex, hoverTex) {}
+
+	virtual void onClick();
+
+};
+
 class RestartButton : public PlayButton
 {
 public:
@@ -393,6 +404,65 @@ public:
 
 	void onClick();
 
+};
+
+class FlagClickerButton : public Button
+{
+public:
+	bool* set;
+	bool once = false;
+	sf::Texture* d;
+	sf::Texture* h;
+
+	FlagClickerButton(sf::Texture* defaultTex, sf::Texture* hoverTex, bool* setter)
+		: Button(defaultTex, hoverTex)
+	{
+		set = setter;
+		d = defaultTex;
+		h = hoverTex;
+
+		if (!(*set))
+		{
+			defaultTex = h;
+			hoverTex = d;
+			me.setTexture(*defaultTex);
+
+		}
+	}
+
+	void Update()
+	{
+		if (!(*set) && !once)
+		{
+			once = true;
+			defaultTexture = h;
+			hoverTexture = d;
+			me.setTexture(*defaultTexture);
+		}
+
+		Button::Update();
+
+		
+
+	}
+
+	virtual void onClick()
+	{
+		(*set) = !(*set);
+		if (!(*set))
+		{
+			defaultTexture = h;
+			hoverTexture = d;
+		}
+		else
+		{
+			defaultTexture = d;
+			hoverTexture = h;
+		}
+
+		me.setTexture(*hoverTexture);
+
+	}
 };
 
 
@@ -456,7 +526,7 @@ public:
 				Flags::SoundsVolume = 0;
 		}
 
-		GetScene()->GetGame()->music.setVolume(Flags::SoundsVolume);
+		//GetScene()->GetGame()->music.setVolume(Flags::SoundsVolume);
 
 	}
 };
